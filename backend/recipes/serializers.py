@@ -5,7 +5,6 @@ import requests
 from django.core.files.base import ContentFile
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import imghdr
 from rest_framework.exceptions import ValidationError
 
 class RecipeSerializer(serializers.ModelSerializer):

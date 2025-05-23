@@ -1,0 +1,58 @@
+.product-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    color: #333;
+  }
+  
+  .product-detail h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  .description {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .rating {
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    display: inline-block;
+    margin-bottom: 2rem;
+  }
+  
+  section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #34495e;
+  }
+  
+  .nutrition ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .nutrition li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .review {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+  }
+  
+  .comments {
+    margin-top: 2rem;
+    font-weight: bold;
+  }
