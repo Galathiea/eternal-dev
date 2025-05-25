@@ -71,7 +71,7 @@ const About: React.FC = () => {
               <h3 className="mb-2 text-xl font-bold">Threcia Mae Cabuguason</h3>
               <p className="text-gray-700">Frontend Developer</p>
               <p className="text-gray-600">
-                Threcia specializes in creating beautiful and responsive user interfaces, ensuring that Flavor Haven provides an exceptional user experience across all devices.
+                Franilyn specializes in creating beautiful and responsive user interfaces, ensuring that Flavor Haven provides an exceptional user experience across all devices.
               </p>
             </div>
 
@@ -81,7 +81,7 @@ const About: React.FC = () => {
               <h3 className="mb-2 text-xl font-bold">Fanilyn Pailagao</h3>
               <p className="text-gray-700">UX/UI Designer</p>
               <p className="text-gray-600">
-                Fanilyn is the creative mind behind EternalHaven Kitchen’s simple visual design, creating an intuitive and engaging experience for our users.
+                Jules is the creative mind behind EternalHaven Kitchen’s simple visual design, creating an intuitive and engaging experience for our users.
               </p>
             </div>
 
@@ -91,7 +91,7 @@ const About: React.FC = () => {
               <h3 className="mb-2 text-xl font-bold">Jules Mag-isa</h3>
               <p className="text-gray-700">Backend Developer</p>
               <p className="text-gray-600">
-                Jules handles all the server-side logic and database management, ensuring that Flavor Haven runs smoothly and securely behind the scenes.
+                Threcia handles all the server-side logic and database management, ensuring that Flavor Haven runs smoothly and securely behind the scenes.
               </p>
             </div>
           </div>

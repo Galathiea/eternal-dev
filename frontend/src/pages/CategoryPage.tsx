@@ -1,99 +1,87 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import RecipeCard from '@/components/RecipeCard';
-
 
 const categoryMap = {
   'healthy-foods': {
     title: 'Healthy Foods',
     description: 'Nutritious and delicious recipes for a healthy lifestyle.',
-    image: "https://plus.unsplash.com/premium_photo-1723118424218-54c1de8140c7?q=80&w=2153&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   'desserts': {
     title: 'Desserts',
     description: 'Sweet treats to satisfy your cravings.',
-    image: 'https://images.unsplash.com/photo-1582461833047-2aeb4f8af173?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   },
   'essential-ingredients': {
     title: 'Essential Ingredients',
     description: 'Recipes featuring fresh, seasonal produce.',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1160&auto=format&fit=crop'
   },
   'main-dishes': {
     title: 'Main Dishes',
     description: 'Easy recipes for meal prepping and planning.',
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1160&auto=format&fit=crop'
   }
 };
 
-
 const getRecipesByCategory = (slug: string) => {
   const allRecipes = [
-
     {
       id: 1,
-      name: 'Quinoa Salad',
-      category: 'healthy-foods',
-      image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1170&auto=format&fit=crop',
-      time: '20 mins',
-      rating: 4.5,
-      title: 'Quinoa Salad',
-      description: 'A healthy and refreshing quinoa salad.',
-      servings: 2,
-      difficulty: 'Easy'
+      name: 'Creamy Garlic Pasta',
+      category: 'main-dishes',
+      time: '30 min',
+      servings: 4,
+      difficulty: 'Easy',
+      description: 'A rich and creamy pasta dish with roasted garlic, parmesan cheese, and fresh herbs.',
+      image: 'https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?q=80&w=1170&auto=format&fit=crop'
     },
     {
       id: 2,
-      name: 'Avocado Toast',
-      category: 'healthy-foods',
-      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=1074&auto=format&fit=crop',
-      time: '10 mins',
-      rating: 4.2,
-      title: 'Avocado Toast',
-      description: 'A quick and nutritious avocado toast.',
-      servings: 1,
-      difficulty: 'Easy'
+      name: 'Spicy Chicken Tacos',
+      category: 'main-dishes',
+      time: '25 min',
+      servings: 3,
+      difficulty: 'Medium',
+      description: 'Tender chicken with a spicy marinade, fresh salsa, and avocado in soft corn tortillas.',
+      image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?q=80&w=1024&auto=format&fit=crop'
     },
-
     {
       id: 3,
-      name: 'Chocolate Cake',
+      name: 'Chocolate Lava Cake',
       category: 'desserts',
-      image: 'https://images.unsplash.com/photo-1565800080246-8a1b718d0ba8?q=80&w=1170&auto=format&fit=crop',
-      time: '60 mins',
-      rating: 4.8,
-      title: 'Chocolate Cake',
-      description: 'A rich and moist chocolate cake.',
-      servings: 8,
-      difficulty: 'Medium'
+      time: '45 min',
+      servings: 6,
+      difficulty: 'Medium',
+      description: 'Decadent chocolate cake with a molten center, served with vanilla ice cream.',
+      image: 'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?q=80&w=1032&auto=format&fit=crop'
     },
-
     {
       id: 4,
-      name: 'Tomato Basil Salad',
-      category: 'essential-ingredients',
-      image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?q=80&w=1171&auto=format&fit=crop',
-      time: '15 mins',
-      rating: 4.3,
-      title: 'Tomato Basil Salad',
-      description: 'A fresh and flavorful tomato basil salad.',
-      servings: 4,
-      difficulty: 'Easy'
+      name: 'Mediterranean Salad',
+      category: 'healthy-foods',
+      time: '15 min',
+      servings: 2,
+      difficulty: 'Easy',
+      description: 'Fresh vegetables, olives, feta cheese, and a tangy lemon dressing.',
+      image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?q=80&w=1074&auto=format&fit=crop'
     },
-
     {
       id: 5,
-      name: 'Grilled Salmon',
+      name: 'Beef Stir Fry',
       category: 'main-dishes',
-      image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1170&auto=format&fit=crop',
-      time: '25 mins',
-      rating: 4.7,
-      title: 'Grilled Salmon',
-      description: 'A perfectly grilled salmon fillet.',
-      servings: 2,
-      difficulty: 'Medium'
+      time: '20 min',
+      servings: 4,
+      difficulty: 'Medium',
+      description: 'Tender beef strips with colorful vegetables in a savory sauce.',
+      image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?q=80&w=1035&auto=format&fit=crop'
+    },
+    {
+      id: 6,
+      name: 'Blueberry Pancakes',
+      category: 'healthy-foods',
+      time: '25 min',
+      servings: 3,
+      difficulty: 'Easy',
+      description: 'Fluffy pancakes loaded with fresh blueberries and drizzled with maple syrup.',
+      image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1080&auto=format&fit=crop'
     }
   ];
 
@@ -101,73 +89,102 @@ const getRecipesByCategory = (slug: string) => {
 };
 
 const CategoryPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams<{ slug?: string }>();
   
   if (!slug) {
-    return <div>Category not found</div>;
+    return (
+      <div className="min-h-screen bg-orange-50 py-8 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl font-bold text-orange-800 mb-6">All Categories</h1>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(categoryMap).map(([categorySlug, category]) => (
+              <Link 
+                key={categorySlug} 
+                to={`/categories/${categorySlug}`}
+                className="overflow-hidden transition-all bg-white rounded-lg shadow-md hover:shadow-lg hover:border-orange-300 border border-transparent"
+              >
+                <div className="p-6">
+                  <h2 className="text-xl font-semibold text-orange-700 mb-2">{category.title}</h2>
+                  <p className="text-orange-600">{category.description}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const category = categoryMap[slug as keyof typeof categoryMap] || {
     title: slug.charAt(0).toUpperCase() + slug.slice(1),
     description: "Explore our collection of recipes.",
-    image: "https://plus.unsplash.com/premium_photo-1723118424218-54c1de8140c7?q=80&w=2153&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   };
 
   const categoryRecipes = getRecipesByCategory(slug);
 
   return (
-    <div className="bg-[#fffaf5] min-h-screen">
-      <div className="relative h-[300px] md:h-[400px] overflow-hidden">
-        <img
-          src={category.image}
-          alt={category.title}
-          className="w-full h-full object-cover brightness-[0.7]"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
-        <div className="absolute inset-0 flex flex-col justify-end p-8">
-          <div className="container">
-            <h1 className="mb-2 text-3xl font-bold text-white md:text-5xl">{category.title} Recipes</h1>
-            <p className="max-w-2xl text-lg text-white/80">{category.description}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="container px-4 py-8 md:px-6">
-        <div className="mb-6">
+    <div className="min-h-screen bg-orange-50 py-8 px-4 md:px-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
           <Link
             to="/categories"
-            className="inline-flex items-center text-sm font-medium text-[#e63946] hover:underline focus:outline-none focus:underline"
+            className="inline-flex items-center text-orange-600 hover:text-orange-800 transition-colors"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Back to All Categories
+            <ChevronLeft className="w-5 h-5 mr-1" />
+            Back to Categories
           </Link>
         </div>
 
-        <div className="flex flex-col space-y-6">
-          <p className="text-[#6b6b6b]">Showing {categoryRecipes.length} recipes</p>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-orange-800 mb-2">{category.title}</h1>
+          <p className="text-orange-700">{category.description}</p>
+        </div>
 
-          {categoryRecipes.length === 0 ? (
-            <div className="py-12 text-center">
-              <p className="text-[#6b6b6b]">No recipes found in this category.</p>
-              <Link 
-                to="/categories" 
-                className="mt-4 inline-block px-4 py-2 bg-[#e63946] text-white rounded-md hover:bg-[#d62c3a]"
+        <div className="space-y-8">
+          <h2 className="text-2xl font-semibold text-orange-800">All Recipes</h2>
+          <p className="text-orange-700 mb-6">
+            Browse our collection of delicious {category.title.toLowerCase()} recipes. Find something that inspires you!
+          </p>
+
+          <div className="space-y-8">
+            {categoryRecipes.map((recipe) => (
+              <div 
+                key={recipe.id} 
+                className="overflow-hidden transition-all bg-white rounded-lg shadow-md hover:shadow-lg hover:border-orange-300 border border-transparent"
               >
-                Browse Other Categories
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {categoryRecipes.map((recipe) => (
-                <RecipeCard 
-                  key={recipe.id} 
-                  recipe={recipe} 
-
-                />
-              ))}
-            </div>
-          )}
+                <div className="md:flex">
+                  <div className="md:w-1/3">
+                    <img
+                      src={recipe.image}
+                      alt={recipe.name}
+                      className="object-cover w-full h-48 md:h-full"
+                    />
+                  </div>
+                  <div className="p-6 md:w-2/3">
+                    <h3 className="text-2xl font-bold text-orange-800 mb-2">{recipe.name}</h3>
+                    <p className="text-orange-700 mb-4">{recipe.description}</p>
+                    
+                    <div className="flex items-center space-x-4 text-sm text-orange-600 mb-4">
+                      <span>{recipe.time}</span>
+                      <span>•</span>
+                      <span>{recipe.servings} servings</span>
+                      <span>•</span>
+                      <span>{recipe.difficulty}</span>
+                    </div>
+                    
+                    <div className="border-t border-orange-200 pt-4">
+                      <Link
+                        to={`/recipes/${recipe.id}`}  // Changed from /recipes-detailes to /recipes
+                        className="inline-block px-6 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+                      >
+                        View Recipe
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

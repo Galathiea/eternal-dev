@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card"
 
 // Import your API client and endpoints
-import { authApi, endpoints } from '../utils/api'; // Adjust path if necessary
+import { authService } from '../services/auth';
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -21,61 +21,63 @@ export default function LoginPage() {
   const [password, setPassword] = useState(''); // State for password input
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(''); // State to display error messages
+  const [successMessage, setSuccessMessage] = useState('');
   const [showSocialConfirm, setShowSocialConfirm] = useState<{ show: boolean; provider: string }>({
     show: false,
     provider: "",
   })
+  const [redirectTimer, setRedirectTimer] = useState<NodeJS.Timeout | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => { // Make this function async
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(''); // Clear previous errors
+    setError('');
 
     try {
-      const response = await authApi.post(endpoints.auth.login, {
-        email: email,
-        username: email, // <--- CRITICAL FIX: Send email as username for JWT authentication
+      await authService.login({
+        username: email,
         password: password,
       });
 
-      console.log('Login successful:', response.data);
-      localStorage.setItem('token', response.data.access); // Save access token
-      localStorage.setItem('refresh_token', response.data.refresh); // Save refresh token
+      // Show success message and redirect after 2 seconds
+      setSuccessMessage('Logged in successfully! Redirecting to homepage...');
+      
+      // Clear any existing timer
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+      }
 
-      // You can remove this dummy flag, it's not truly needed if you rely on 'token'
-      localStorage.setItem("isLoggedIn", "true"); // Optional: for immediate UI updates, but token is primary
+      // Set new timer for redirection
+      const timer = setTimeout(() => {
+        navigate('/');
+      }, 2000);
 
-      navigate('/'); // Redirect to home page after successful login
+      setRedirectTimer(timer);
     } catch (err: any) { // Catch actual API errors
       setIsLoading(false); // Ensure loading state is reset on error
       console.error('Login failed:', err);
 
       if (err.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        if (err.response.status === 401) {
-          setError('No active account found with the given credentials. Please check your email and password.'); // Covers "No active account"
-        } else if (err.response.status === 405) {
-          setError('Method "POST" not allowed for this endpoint. Please check backend URL configuration.'); // Covers "Method POST not allowed"
-        } else if (err.response.data) {
-          // Attempt to display specific backend validation errors
+        console.error('Server response:', err.response);
+        if (err.response.data) {
+          console.error('Server error data:', err.response.data);
           if (err.response.data.detail) {
             setError(err.response.data.detail);
           } else if (err.response.data.username) {
-            setError(`Username: ${err.response.data.username.join(', ')}`); // Catches "username is required"
+            setError(`Username error: ${err.response.data.username.join(', ')}`);
+          } else if (err.response.data.password) {
+            setError(`Password error: ${err.response.data.password.join(', ')}`);
           } else if (err.response.data.non_field_errors) {
             setError(err.response.data.non_field_errors.join(', '));
           } else {
-            setError('Login failed. Please check your inputs or try again.'); // General fallback for other 4xx errors
+            setError(`Server error: ${err.response.statusText}`);
           }
         } else {
-          setError('An unexpected error occurred from the server. Please try again.');
+          setError(`HTTP Error ${err.response.status}: ${err.response.statusText}`);
         }
       } else if (err.request) {
-        // The request was made but no response was received
-        setError('No response from server. Please check your internet connection or server status.');
+        setError('No response from server. Please check if the backend is running.');
       } else {
-        // Something happened in setting up the request that triggered an Error
         setError('An unexpected error occurred. Please try again.');
       }
     } finally {
@@ -114,7 +116,8 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>} {/* Display error message */}
+            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-[#2b2b2b]">
                 Email

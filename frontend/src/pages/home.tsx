@@ -2,64 +2,63 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Home: React.FC = () => {
-
+  // In the Home component, update the featuredRecipes array to use IDs instead of routes:
   const featuredRecipes = [
     {
+      id: 1, // Add ID
       title: "Creamy Garlic Pasta",
       description: "A rich and creamy pasta dish with roasted garlic, parmesan cheese, and fresh herbs.",
       time: "30 min",
       servings: "4 servings",
       difficulty: "Easy",
-      route: "/creamy-garlic-pasta",
       image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?q=80&w=880&auto=format&fit=crop"
     },
     {
+      id: 2,
       title: "Spicy Chicken Tacos",
       description: "Tender chicken with a spicy marinade, fresh salsa, and mozzarella in red corn tortillas.",
       time: "25 min",
       servings: "3 servings",
       difficulty: "Medium",
-      route: "/Spicy-Chicken-Tacos",
       image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
     },
     {
+      id: 3,
       title: "Chocolate Lava Cake",
       description: "Decadent chocolate cake with a molten center, served with vanilla ice cream.",
       time: "45 min",
       servings: "6 servings",
       difficulty: "Medium",
-      route: "/Chocolate-Lava-Cake",
       image: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
     },
     {
+      id: 4,
       title: "Mediterranean Salad",
       description: "Fresh vegetables, olives, feta cheese, and a tangy olive oil dressing.",
       time: "20 min",
       servings: "2 servings",
       difficulty: "Easy",
-      route: "/Mediterranean-Salad",
       image: "https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
     },
     {
+      id: 5,
       title: "Beef Stir Fry",
       description: "Tender beef, broccoli, and colorful vegetables in a savory soy sauce.",
       time: "30 min",
       servings: "4 servings",
       difficulty: "Medium",
-      route: "/Beef-Stir-Fry",
       image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
     },
     {
+      id: 6,
       title: "Blueberry Pancakes",
       description: "Fluffy pancakes filled with fresh blueberries and drizzled with maple syrup.",
       time: "25 min",
       servings: "2 servings",
       difficulty: "Easy",
-      route: "/Blueberry-Pancakes",
       image: "https://plus.unsplash.com/premium_photo-1692193552327-3458ef3817c0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
   ];
-
 
   const categories = [
     {
@@ -90,10 +89,9 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-orange-100">
-
       <div
         className="relative bg-cover bg-center h-[500px] flex items-center"
-        style={{ backgroundImage: "url('/images/hero-image.jpg')" }}
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1543353071-087092ec393a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}
       >
         <div className="absolute inset-0 bg-black/30"></div>
         <div className="container relative z-10 px-8 mx-auto">
@@ -122,7 +120,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-
       <div className="container px-4 py-16 mx-auto">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-gray-800">Featured Recipes</h2>
@@ -133,7 +130,7 @@ const Home: React.FC = () => {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {featuredRecipes.map((recipe, index) => (
             <div key={index} className="relative flex flex-col h-full p-0 overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-xl hover:shadow-lg group">
-             <div className="h-48 overflow-hidden">
+              <div className="h-48 overflow-hidden">
                 <img 
                   src={recipe.image} 
                   alt={recipe.title}
@@ -150,7 +147,10 @@ const Home: React.FC = () => {
                   <span>📊 {recipe.difficulty}</span>
                 </div>
                 <div className="pt-4 mt-auto">
-                  <Link to={recipe.route} className="flex items-center justify-center w-full gap-2 px-4 py-2 text-orange-600 transition-all duration-300 transform bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 hover:-translate-y-0.5">
+                  <Link 
+                    to={`/recipes/${recipe.id}`}
+                    className="flex items-center justify-center w-full gap-2 px-4 py-2 text-orange-600 transition-all duration-300 transform bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 hover:-translate-y-0.5"
+                  >
                     <span>View Recipe</span>
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -163,7 +163,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-
       <div className="container px-4 py-16 mx-auto">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-gray-800">Browse by Category</h2>
@@ -173,7 +172,11 @@ const Home: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {categories.map((category, index) => (
-            <div key={index} className="relative flex flex-col h-full p-0 overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-xl hover:shadow-lg group">
+            <Link 
+              to={category.route} 
+              key={index} 
+              className="relative flex flex-col h-full p-0 overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-xl hover:shadow-lg group"
+            >
               <div className="h-48 overflow-hidden">
                 <img src={category.imageUrl} alt={category.title} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105" />
               </div>
@@ -181,15 +184,15 @@ const Home: React.FC = () => {
                 <h3 className="mb-2 text-xl font-bold text-gray-800">{category.title}</h3>
                 <p className="mb-4 text-gray-600">{category.description}</p>
                 <div className="pt-4 mt-auto">
-                  <Link to={category.route} className="flex items-center justify-center w-full gap-2 px-4 py-2 text-orange-600 transition-all duration-300 transform bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 hover:-translate-y-0.5">
+                  <div className="flex items-center justify-center w-full gap-2 px-4 py-2 text-orange-600 transition-all duration-300 transform bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 hover:-translate-y-0.5">
                     <span>Browse Category</span>
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
-                  </Link>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
