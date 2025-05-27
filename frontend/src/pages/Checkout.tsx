@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { cartItems, cartTotal } = useCart();
+  const { cartItems } = useCart();
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
@@ -17,7 +17,7 @@ const Checkout = () => {
   });
 
   const shippingFee = 100; // Fixed shipping fee
-  const subtotal = cartTotal;
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const total = subtotal + shippingFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,9 +134,9 @@ const Checkout = () => {
                         value="credit-card"
                         checked={paymentMethod === 'credit-card'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="h-4 w-4 text-orange-600 focus:ring-orange-500"
+                        className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                       />
-                      <label htmlFor="credit-card" className="ml-3 block text-sm font-medium text-gray-700">
+                      <label htmlFor="credit-card" className="block ml-3 text-sm font-medium text-gray-700">
                         Credit Card
                       </label>
                     </div>
@@ -148,9 +148,9 @@ const Checkout = () => {
                         value="gcash"
                         checked={paymentMethod === 'gcash'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="h-4 w-4 text-orange-600 focus:ring-orange-500"
+                        className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                       />
-                      <label htmlFor="gcash" className="ml-3 block text-sm font-medium text-gray-700">
+                      <label htmlFor="gcash" className="block ml-3 text-sm font-medium text-gray-700">
                         GCash
                       </label>
                     </div>
@@ -162,9 +162,9 @@ const Checkout = () => {
                         value="paypal"
                         checked={paymentMethod === 'paypal'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="h-4 w-4 text-orange-600 focus:ring-orange-500"
+                        className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                       />
-                      <label htmlFor="paypal" className="ml-3 block text-sm font-medium text-gray-700">
+                      <label htmlFor="paypal" className="block ml-3 text-sm font-medium text-gray-700">
                         PayPal
                       </label>
                     </div>
@@ -185,9 +185,9 @@ const Checkout = () => {
                   {cartItems.map(item => (
                     <div key={item.id} className="flex justify-between py-3 border-b border-gray-200">
                       <div className="flex items-center">
-                        <img className="object-cover w-12 h-12 rounded-md" src={item.image} alt={item.title} />
+                        <img className="object-cover w-12 h-12 rounded-md" src={item.image} alt={item.name} />
                         <div className="ml-3">
-                          <h3 className="text-sm font-medium text-gray-800">{item.title}</h3>
+                          <h3 className="text-sm font-medium text-gray-800">{item.name}</h3>
                           <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                         </div>
                       </div>

@@ -9,20 +9,20 @@ import Signup from "./pages/Signup";
 import Cart from "./pages/Cart";
 import CartPage from "./pages/Cartpage";
 import Checkout from "./pages/Checkout";
+import CheckoutConfirmation from "./pages/CheckoutConfirmation";
 import CategoryPage from "./pages/CategoryPage";
 import OrderConfirmation from "./pages/CheckoutConfirmation";
 import OurStory from "./pages/OurStory";
 import Recipes from "./pages/recipes";
 import ProductDetail from "./pages/productdetail";
 import RecipeDetail from "./pages/RecipeDetail";
-import { Profile } from "./pages/profile";
 import Dashboard from "./components/Dashboard";
 import BackendTest from "./components/BackendTest";
 import Footer from "./components/Footer";
-import  ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
-
+import Profile from "./pages/Profile"; 
 export default function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -33,7 +33,7 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-orange-100">
+      <div className="flex items-center justify-center min-h-screen bg-orange-100">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-orange-600">Loading...</h1>
         </div>
@@ -47,22 +47,12 @@ export default function App() {
         <Router>
           <Navbar />
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/cart-page" element={<CartPage />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/checkout-confirmation" element={<OrderConfirmation />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-            </Route>
-
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/recipes/:id" element={<RecipeDetail />} />
             <Route path="/categories" element={<CategoryPage />} />
@@ -70,6 +60,19 @@ export default function App() {
             <Route path="/our-story" element={<OurStory />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/backend-test" element={<BackendTest />} />
+            
+            {/* Semi-Protected Routes (Cart remains public) */}
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/cart-page" element={<CartPage />} />
+            
+            {/* Fully Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout-confirmation" element={<OrderConfirmation />} />
+              <Route path="/profile" element={<Profile />} /> {/* Add the ProfilePage route */}
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Route>
+            
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Footer />

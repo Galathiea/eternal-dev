@@ -1,14 +1,18 @@
 // src/pages/RecipeDetail.tsx
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 const RecipeDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   
-  // In a real app, you would fetch this data based on the ID
+  // Recipe data - in a real app you would fetch this based on the ID
   const recipe = {
-    id: 1,
-    title: "Creamy Garlic Pasta",
+    id: "1", // changed to string to match CartItem interface
+    name: "Creamy Garlic Pasta", // changed from title to name to match interface
+    price: 12.99, // added price to match CartItem interface
     description: "A rich and creamy pasta dish with roasted garlic, parmesan cheese, and fresh herbs.",
     time: "30 min",
     servings: "4 servings",
@@ -35,26 +39,43 @@ const RecipeDetail: React.FC = () => {
     ]
   };
 
+  const handleAddToCart = () => {
+    addToCart({
+      id: recipe.id,
+      name: recipe.name,
+      price: recipe.price,
+      quantity: 1, // default quantity
+      image: recipe.image,
+      time: recipe.time,
+      servings: recipe.servings
+    });
+    
+    // Optional: Show feedback before navigating
+    alert(`${recipe.name} added to cart!`);
+    navigate('/cart');
+  };
+
   return (
-    <div className="min-h-screen bg-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen px-4 py-12 bg-orange-50 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="overflow-hidden bg-white shadow-md rounded-xl">
           <div className="md:flex">
             <div className="md:flex-shrink-0 md:w-1/2">
               <img 
-                className="h-full w-full object-cover" 
+                className="object-cover w-full h-full" 
                 src={recipe.image} 
-                alt={recipe.title}
+                alt={recipe.name}
               />
             </div>
             <div className="p-8">
-              <div className="uppercase tracking-wide text-sm text-orange-600 font-semibold">
+              <div className="text-sm font-semibold tracking-wide text-orange-600 uppercase">
                 {recipe.difficulty} • {recipe.time} • {recipe.servings}
               </div>
               <h1 className="mt-2 text-3xl font-extrabold text-gray-900">
-                {recipe.title}
+                {recipe.name}
               </h1>
-              <p className="mt-3 text-gray-600">{recipe.description}</p>
+              <p className="mt-3 text-base text-gray-600">{recipe.description}</p>
+              <p className="mt-2 text-lg font-bold text-gray-800">${recipe.price.toFixed(2)}</p>
               
               <div className="mt-6">
                 <h2 className="text-xl font-bold text-gray-800">Ingredients</h2>
@@ -69,13 +90,16 @@ const RecipeDetail: React.FC = () => {
                 <h2 className="text-xl font-bold text-gray-800">Instructions</h2>
                 <ol className="mt-2 list-decimal list-inside">
                   {recipe.instructions.map((step, index) => (
-                    <li key={index} className="text-gray-700 mb-2">{step}</li>
+                    <li key={index} className="mb-2 text-gray-700">{step}</li>
                   ))}
                 </ol>
               </div>
               
               <div className="mt-8">
-                <button className="px-6 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors">
+                <button 
+                  onClick={handleAddToCart}
+                  className="px-6 py-3 font-medium text-white transition-colors bg-orange-600 rounded-lg hover:bg-orange-700"
+                >
                   Add to Cart
                 </button>
               </div>

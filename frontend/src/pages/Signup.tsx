@@ -106,7 +106,7 @@ export default function SignupPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {error && <p className="text-red-500 text-center mb-4">{error}</p>} {/* Display error */}
+                    {error && <p className="mb-4 text-center text-red-500">{error}</p>} {/* Display error */}
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">

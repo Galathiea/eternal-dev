@@ -11,8 +11,10 @@ const Navbar: React.FC<NavbarProps> = () => {
   const { cartItems } = useCart();
   const navigate = useNavigate();
 
+  // Handle logout function
   const handleLogout = () => {
     logout();
+    localStorage.removeItem("isLoggedIn"); // Ensure localStorage is cleared
     navigate('/');
   };
 
@@ -61,32 +63,46 @@ const Navbar: React.FC<NavbarProps> = () => {
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          {isAuthenticated ? (
+          {/* Auth Section - Updated with your original logic */}
+          {isAuthenticated || localStorage.getItem("isLoggedIn") === "true" ? (
             <div className="flex items-center space-x-3">
+              {/* Profile Link with Icon */}
               <Link 
-                to="/profile" 
-                className="flex items-center text-gray-700 hover:text-orange-600 transition-colors"
-              >
+                to="/profile" >
                 <div className="flex items-center">
                   {user?.profileImage ? (
                     <img 
                       src={user.profileImage} 
                       alt="Profile" 
-                      className="w-8 h-8 rounded-full object-cover border border-orange-200"
+                      className="object-cover w-8 h-8 border border-orange-200 rounded-full"
                     />
                   ) : (
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-500">
+                    <div className="flex items-center justify-center w-8 h-8 text-orange-500 bg-orange-100 rounded-full">
                       <FaUser className="text-lg" />
                     </div>
                   )}
-                  <span className="ml-2 font-medium hidden md:inline-block">
+                  <span className="hidden ml-2 font-medium md:inline-block">
                     {user?.name || 'Profile'}
                   </span>
                 </div>
               </Link>
+
+              {/* Cart with Icon */}
+              <Link to="/cart" className="text-gray-700 hover:text-orange-600">
+                <div className="relative p-2">
+                  <FaShoppingCart className="text-2xl" />
+                  {cartItems.length > 0 && (
+                    <span className="absolute top-0 right-0 px-1 text-xs text-white bg-red-400 rounded-full">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </div>
+              </Link>
+
+              {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="flex items-center px-3 py-2 text-sm text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors"
+                className="flex items-center px-3 py-2 text-sm text-white transition-colors bg-orange-600 rounded-lg hover:bg-orange-700"
               >
                 <FaSignOutAlt className="mr-2" />
                 <span className="hidden md:inline-block">Logout</span>
@@ -94,22 +110,11 @@ const Navbar: React.FC<NavbarProps> = () => {
             </div>
           ) : (
             <Link to="/login" className="text-gray-700 hover:text-gray-900">
-              <button className="px-6 py-2 border rounded-lg text-orange-500 border-gray-300 hover:bg-orange-50 transition-colors">
+              <button className="px-6 py-2 text-orange-500 transition-colors border border-gray-300 rounded-lg hover:bg-orange-50">
                 Log in
               </button>
             </Link>
           )}
-
-          <Link to="/cart" className="text-gray-700 hover:text-orange-600">
-            <div className="relative p-2">
-              <FaShoppingCart className="text-2xl" />
-              {cartItems.length > 0 && (
-                <span className="absolute top-0 right-0 px-1 text-xs text-white bg-red-400 rounded-full">
-                  {cartItems.length}
-                </span>
-              )}
-            </div>
-          </Link>
         </div>
       </div>
     </nav>

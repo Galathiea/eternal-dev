@@ -36,16 +36,16 @@ const CheckoutConfirmation = () => {
       <div className="max-w-3xl mx-auto">
         <div className="overflow-hidden bg-white rounded-lg shadow">
           <div className="px-6 py-8 sm:p-10">
-            <div className="text-center mb-8">
+            <div className="mb-8 text-center">
               <div className="flex items-center justify-center mb-4">
                 <FaCheckCircle className="text-4xl text-green-500" />
               </div>
-              <h1 className="text-3xl font-bold text-green-600 mb-2">Payment Successful!</h1>
+              <h1 className="mb-2 text-3xl font-bold text-green-600">Payment Successful!</h1>
               <p className="text-gray-600">Thank you for your purchase!</p>
             </div>
 
-            <div className="border-b pb-6">
-              <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
+            <div className="pb-6 border-b">
+              <h2 className="mb-4 text-xl font-semibold">Shipping Information</h2>
               <div className="space-y-2">
                 <div className="flex items-center">
                   <FaTruck className="mr-2" />
@@ -57,11 +57,11 @@ const CheckoutConfirmation = () => {
               </div>
             </div>
 
-            <div className="border-b pb-6">
-              <h2 className="text-xl font-semibold mb-4">Order Items</h2>
+            <div className="pb-6 border-b">
+              <h2 className="mb-4 text-xl font-semibold">Order Items</h2>
               <div className="space-y-4">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center">
+                  <div key={item.id} className="flex items-center justify-between">
                     <div>
                       <h3 className="font-medium">{item.name}</h3>
                       <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
@@ -72,8 +72,8 @@ const CheckoutConfirmation = () => {
               </div>
             </div>
 
-            <div className="border-b pb-6">
-              <h2 className="text-xl font-semibold mb-4">Order Details</h2>
+            <div className="pb-6 border-b">
+              <h2 className="mb-4 text-xl font-semibold">Order Details</h2>
               <div className="space-y-4">
                 <div className="flex items-center text-green-600">
                   <FaClock className="mr-2" />
@@ -83,7 +83,7 @@ const CheckoutConfirmation = () => {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+              <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
@@ -104,19 +104,19 @@ const CheckoutConfirmation = () => {
               </div>
             </div>
 
-            <div className="mt-8 flex justify-center space-x-4">
+            <div className="flex justify-center mt-8 space-x-4">
               <button
                 onClick={() => {
                   clearCart();
                   navigate('/profile/orders');
                 }}
-                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                className="px-6 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
                 View My Orders
               </button>
               <button
                 onClick={() => navigate('/')}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="px-6 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               >
                 Continue Shopping
               </button>
