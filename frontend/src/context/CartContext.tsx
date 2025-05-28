@@ -1,71 +1,71 @@
-// src/context/CartContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'; // ⭐ Make sure React and useEffect are imported ⭐
-import { toast } from 'react-toastify'; // Assuming you still want toast
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { toast } from 'react-toastify';
 
 interface CartItem {
-  id: number;
+  id: string;
   name: string;
   price: string; // Keep this as string if Recipe.price is string
   quantity: number;
   image: string;
+  time?: string;
+  servings?: string;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'> & { price: string }) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  getCartTotal: () => number;
-  cartCount: number;
+  restoreCart: (items: CartItem[]) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider = ({ children }: { children: ReactNode }) => {
-  // ⭐ THIS IS THE CRUCIAL PART - ENSURE THIS EXACT useState INITIALIZATION IS HERE ⭐
+export function CartProvider({ children }: { children: ReactNode }) {
+  // Initialize state with localStorage if available
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     try {
-      const storedCart = localStorage.getItem('cartItems');
-      // If storedCart is null or empty, JSON.parse(null) would be null.
-      // We explicitly ensure it's an empty array if parsing fails or storage is empty.
-      return storedCart ? JSON.parse(storedCart) : [];
+      const savedCart = localStorage.getItem('cart');
+      return savedCart ? JSON.parse(savedCart) : [];
     } catch (error) {
       console.error("Failed to parse cart from localStorage:", error);
-      return []; // Always return an array, even on error during parsing
+      return [];
     }
   });
 
-  // ⭐ THIS useEffect IS ALSO CRUCIAL FOR PERSISTENCE ⭐
+  // Persist cart to localStorage whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      localStorage.setItem('cart', JSON.stringify(cartItems));
     } catch (error) {
       console.error("Failed to save cart to localStorage:", error);
     }
   }, [cartItems]);
 
-  const addToCart = (item: Omit<CartItem, 'quantity'> & { price: string }) => {
+  const addToCart = (item: CartItem) => {
     setCartItems(prev => {
-      const existingItem = prev.find(i => i.id === item.id);
+      const existingItem = prev.find(cartItem => cartItem.id === item.id);
       if (existingItem) {
-        return prev.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        return prev.map(cartItem =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
+            : cartItem
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, item];
     });
     toast.success(`${item.name} added to cart!`);
   };
 
-  const removeFromCart = (id: number) => {
+  const removeFromCart = (id: string) => {
     setCartItems(prev => prev.filter(item => item.id !== id));
     toast.info("Item removed from cart!");
   };
 
-  const updateQuantity = (id: number, quantity: number) => {
+  const updateQuantity = (id: string, quantity: number) => {
     if (quantity < 1) {
-      removeFromCart(id); // Remove if quantity is 0 or less
+      removeFromCart(id);
       return;
     }
     setCartItems(prev =>
@@ -78,14 +78,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     toast.info("Cart has been cleared!");
   };
 
-  const getCartTotal = () => {
-    return cartItems.reduce(
-      (total, item) => total + Number(item.price) * item.quantity,
-      0
-    );
+  const restoreCart = (items: CartItem[]) => {
+    setCartItems(items);
   };
-
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <CartContext.Provider
@@ -95,19 +90,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         removeFromCart,
         updateQuantity,
         clearCart,
-        getCartTotal,
-        cartCount,
+        restoreCart
       }}
     >
       {children}
     </CartContext.Provider>
   );
-};
+}
 
-export const useCart = () => {
+export function useCart() {
   const context = useContext(CartContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;
-};
+}

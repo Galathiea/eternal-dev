@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext'; // ⭐ Import useCart ⭐
-import { toast } from 'react-toastify'; // ⭐ Import toast for notifications ⭐
+import { useCart } from '../context/CartContext';
+import { toast } from 'react-toastify';
 
-// Define the interface for your Recipe data.
 interface Recipe {
   id: number;
   title: string;
@@ -15,7 +14,7 @@ interface Recipe {
   servings: number;
   price: string; // price as string from DRF
   category: { id: number; name: string } | null;
-  image: string | null; // Make image potentially null if it can be
+  image: string | null;
   created_at: string;
   updated_at: string;
   user?: number;
@@ -28,7 +27,7 @@ const RecipeDetail: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { addToCart } = useCart(); // ⭐ Get addToCart from your cart context ⭐
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -69,18 +68,16 @@ const RecipeDetail: React.FC = () => {
     }
   }, [id]);
 
-  // ⭐ Add this handler for the Add to Cart button ⭐
   const handleAddToCart = () => {
     if (recipe) {
-      // The `addToCart` function in your CartContext likely expects an object
-      // with `id`, `name`, `price`, and `image` (if applicable).
       addToCart({
-        id: recipe.id,
-        name: recipe.title, // Use title as name for cart item
-        price: recipe.price, // Price is already a string
-        image: recipe.image || '', // Ensure image is a string, provide default if null
+        id: recipe.id.toString(),
+        name: recipe.title,
+        price: recipe.price,
+        image: recipe.image || '',
+        quantity: 1,
       });
-      toast.success(`${recipe.title} added to cart!`); // Show a success notification
+      toast.success(`${recipe.title} added to cart!`);
     }
   };
 
@@ -162,7 +159,6 @@ const RecipeDetail: React.FC = () => {
                 </span>
                 <span className="text-gray-500 text-sm">(Price per serving)</span>
               </div>
-              {/* ⭐ ADDED: "Add to Cart" Button and its container ⭐ */}
               <div className="mt-6 flex justify-between items-center">
                 <Link
                   to="/recipes"
@@ -171,7 +167,7 @@ const RecipeDetail: React.FC = () => {
                   Back to Recipes List
                 </Link>
                 <button
-                  onClick={handleAddToCart} // ⭐ Call the handler here ⭐
+                  onClick={handleAddToCart}
                   className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75"
                 >
                   Add to Cart

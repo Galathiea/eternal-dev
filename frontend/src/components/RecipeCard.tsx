@@ -31,27 +31,28 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                                    // for programmatic navigation (e.g., after adding to cart, navigate to cart page).
                                    // The <Link> component handles the primary card navigation.
 
-  const cartItem = cartItems.find(item => item.id === recipe.id);
+  const cartItem = cartItems.find(item => item.id === recipe.id.toString());
   const quantity = cartItem?.quantity || 0;
 
   const handleIncrement = (e: React.MouseEvent) => { // Add MouseEvent type for better safety
     e.stopPropagation(); // ⭐ Prevent the Link from triggering when clicking + button
     if (quantity === 0) {
       addToCart({
-        id: recipe.id,
+        id: recipe.id.toString(),
         name: recipe.title,
-        price: recipe.price,
+        price: recipe.price.toString(),
         image: recipe.image ?? "",
+        quantity: 1,
       });
     } else {
-      updateQuantity(recipe.id, quantity + 1);
+      updateQuantity(recipe.id.toString(), quantity + 1);
     }
   };
 
   const handleDecrement = (e: React.MouseEvent) => { // Add MouseEvent type for better safety
     e.stopPropagation(); // ⭐ Prevent the Link from triggering when clicking - button
     if (quantity > 0) {
-      updateQuantity(recipe.id, quantity - 1);
+      updateQuantity(recipe.id.toString(), quantity - 1);
     }
   };
 

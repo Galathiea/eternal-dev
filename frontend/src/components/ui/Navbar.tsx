@@ -68,9 +68,9 @@ const Navbar: React.FC<NavbarProps> = () => {
                 className="flex items-center text-gray-700 hover:text-orange-600 transition-colors"
               >
                 <div className="flex items-center">
-                  {user?.profileImage ? (
+                  {user?.profile_image ? (
                     <img 
-                      src={user.profileImage} 
+                      src={user.profile_image} 
                       alt="Profile" 
                       className="w-8 h-8 rounded-full object-cover border border-orange-200"
                     />
@@ -80,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                     </div>
                   )}
                   <span className="ml-2 font-medium hidden md:inline-block">
-                    {user?.name || 'Profile'}
+                    {user?.username || 'Profile'}
                   </span>
                 </div>
               </Link>

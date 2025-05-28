@@ -1,11 +1,8 @@
-# C:\Users\Galathiea\OneDrive\Documents\eternal-dev\backend\users\views.py
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User # Ensure User model is imported
 from .serializers import UserSerializer # Ensure your UserSerializer is imported
-
-# Import SimpleJWT views and serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -13,6 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 # RegisterView for creating new users
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
+    # FIX: permission_classes must be an iterable (e.g., a tuple)
     permission_classes = (AllowAny,)  # Allow anyone to register
     serializer_class = UserSerializer  # Use your custom UserSerializer
 
@@ -53,6 +51,8 @@ class LoginView(TokenObtainPairView):
     # which is specifically designed to handle POST requests
     # to exchange username/password for access and refresh tokens.
     serializer_class = TokenObtainPairSerializer
+    # FIX: permission_classes must be an iterable (e.g., a tuple)
+    permission_classes = (AllowAny,)  # Allow anyone to log in
 
     # IMPORTANT: Removed http_method_names = ['get']
     # TokenObtainPairView inherently handles POST requests.
@@ -62,6 +62,7 @@ class LoginView(TokenObtainPairView):
 # Current User View
 class CurrentUserView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
+    # FIX: permission_classes must be an iterable (e.g., a tuple)
     permission_classes = (IsAuthenticated,)
 
     def get_object(self):

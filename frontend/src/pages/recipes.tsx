@@ -152,7 +152,7 @@ const Recipes: React.FC = () => {
                   <span>⏱️ Prep: {recipe.prep_time} min</span>
                   <span>🔥 Cook: {recipe.cook_time} min</span>
                   <span>🍽️ {recipe.servings} servings</span>
-                  <span>💰 ${recipe.price.toFixed(2)}</span>
+                  <span>💰 ${typeof recipe.price === "number" ? recipe.price.toFixed(2) : "N/A"}</span>
                   {/* Note: 'difficulty' from static data is not in your backend model. Remove or implement if added to backend. */}
                 </div>
 

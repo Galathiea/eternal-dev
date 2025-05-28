@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -8,10 +8,10 @@ from cart.models import Cart, CartItem
 from categories.models import Category
 from .serializers import (
     UserSerializer, RecipeSerializer, ReviewSerializer,
-    CartSerializer, CartItemSerializer, CategorySerializer
+    CartSerializer, CategorySerializer
 )
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -19,12 +19,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return User.objects.filter(id=self.request.user.id)
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class RecipeViewSet(viewsets.ModelViewSet):
+class RecipeViewSet(generics.ListAPIView):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -32,7 +32,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class ReviewViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(generics.ListAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -40,7 +40,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class CartViewSet(viewsets.ModelViewSet):
+class CartViewSet(generics.ListAPIView):
     serializer_class = CartSerializer
     permission_classes = [permissions.IsAuthenticated]
 

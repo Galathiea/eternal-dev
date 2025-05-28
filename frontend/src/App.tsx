@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer } from 'react-toastify'; // Import ToastContainer
-import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Core Layout Components
 import Navbar from "./components/ui/Navbar";
@@ -17,9 +17,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import CartPage from "./pages/Cartpage"; // ⭐ Confirmed: Use CartPage.tsx (or Cartpage.tsx) ⭐
-// import Cart from "./pages/Cart"; // ⭐ REMOVE THIS LINE if not in use ⭐
-
+import CartPage from "./pages/Cartpage";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/CheckoutConfirmation";
 import CategoryPage from "./pages/CategoryPage";
@@ -27,15 +25,14 @@ import OurStory from "./pages/OurStory";
 import Recipes from "./pages/recipes";
 import ProductDetail from "./pages/productdetail";
 import RecipeDetail from "./pages/RecipeDetail";
-import { Profile } from "./pages/profile";
 import Dashboard from "./components/Dashboard";
 import BackendTest from "./components/BackendTest";
-import ProtectedRoute from "./components/ProtectedRoute"; // Ensure this path is correct and case-sensitive
+import ProtectedRoute from "./components/ProtectedRoute";
+import { Profile } from "./pages/profile";
 
 export default function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 
-  // This useEffect ensures the page is displayed only after initial load, preventing FOUC (Flash of Unstyled Content)
   React.useEffect(() => {
     document.documentElement.style.display = 'block';
     setIsLoading(false);
@@ -43,7 +40,7 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-orange-100">
+      <div className="flex items-center justify-center min-h-screen bg-orange-100">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-orange-600">Loading...</h1>
         </div>
@@ -57,7 +54,7 @@ export default function App() {
         <Router>
           <Navbar />
           <Routes>
-            {/* Public Routes - accessible to everyone */}
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -70,18 +67,10 @@ export default function App() {
             <Route path="/our-story" element={<OurStory />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/backend-test" element={<BackendTest />} />
-
-            {/* ⭐ Cart Page - DECIDE if it should be protected or public ⭐
-                 For most e-commerce, the cart itself is public, but checkout requires login.
-                 I'll place it here as public for now, as it's common.
-                 If you want it protected, move it inside <ProtectedRoute> below.
-            */}
             <Route path="/cart" element={<CartPage />} />
 
-            {/* Protected Routes - require authentication */}
+            {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
-              {/* If you moved /cart above, remove it from here: */}
-              {/* <Route path="/cart" element={<CartPage />} /> */}
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/checkout-confirmation" element={<OrderConfirmation />} />
               <Route path="/profile" element={<Profile />} />
@@ -92,7 +81,6 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Footer />
-          {/* ⭐ ToastContainer for react-toastify notifications ⭐ */}
           <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
         </Router>
       </CartProvider>

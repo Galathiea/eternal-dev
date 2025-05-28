@@ -5,7 +5,6 @@ import { Link } from "react-router-dom"
 import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react"
 import { Dialog, DialogContent } from "./ui/dialog"
 import { Button } from "./ui/button"
-import Separator from "./ui/separator"
 import { Badge } from "./ui/badge"
 
 // Cart store interface
