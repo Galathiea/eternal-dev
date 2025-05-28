@@ -1,11 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "@/context/CartContext";
+import { toast } from "react-toastify";
 
 const Home: React.FC = () => {
-  // In the Home component, update the featuredRecipes array to use IDs instead of routes:
+  const { addToCart } = useCart();
+
   const featuredRecipes = [
     {
-      id: 1, // Add ID
+      id: 1,
+      title: "Chicken Adobo",
+      description: "It's a savory Filipino stew featuring chicken braised in vinegar, soy sauce, garlic, and black peppercorns, creating a deliciously tangy and umami-rich dish..",
+      time: "55 min",
+      servings: "4 servings",
+      difficulty: "Easy",
+      image: "https://plus.unsplash.com/premium_photo-1664391929657-f901ee7f1414?q=80&w=1953&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    },
+    {
+      id: 7,
       title: "Creamy Garlic Pasta",
       description: "A rich and creamy pasta dish with roasted garlic, parmesan cheese, and fresh herbs.",
       time: "30 min",
@@ -87,6 +99,20 @@ const Home: React.FC = () => {
     },
   ];
 
+  // Add to cart handler for featured recipes
+  const handleAddToCart = (recipe: typeof featuredRecipes[0]) => {
+    addToCart({
+      id: String(recipe.id),
+      name: recipe.title,
+      price: 199.00, // Use number for price to match CartItem interface
+      quantity: 1,
+      image: recipe.image,
+      time: recipe.time,
+      servings: recipe.servings,
+    });
+    toast.success(`${recipe.title} added to cart!`);
+  };
+
   return (
     <div className="min-h-screen bg-orange-100">
       <div
@@ -146,7 +172,7 @@ const Home: React.FC = () => {
                   <span>🍽️ {recipe.servings}</span>
                   <span>📊 {recipe.difficulty}</span>
                 </div>
-                <div className="pt-4 mt-auto">
+                <div className="pt-4 mt-auto flex flex-col gap-2">
                   <Link 
                     to={`/recipes/${recipe.id}`}
                     className="flex items-center justify-center w-full gap-2 px-4 py-2 text-orange-600 transition-all duration-300 transform bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 hover:-translate-y-0.5"
@@ -156,6 +182,15 @@ const Home: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </Link>
+                  <button
+                    onClick={() => handleAddToCart(recipe)}
+                    className="flex items-center justify-center w-full gap-2 px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-all duration-300"
+                  >
+                    <span>Add to Cart</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007.52 17h8.96a1 1 0 00.87-1.47L17 13M7 13V6a1 1 0 011-1h5a1 1 0 011 1v7" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>

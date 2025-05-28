@@ -155,8 +155,15 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# CORS settings
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False # Ensure this is False
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5175",  # Your frontend's current development URL
+    "http://127.0.0.1:5175",  # Include both localhost and 127.0.0.1 for safety
+    # Add your production frontend URL(s) here when you deploy, e.g.:
+    # "https://www.your-live-frontend.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True # This is crucial since your frontend uses credentials: 'include'
 # Stripe settings
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', 'your_stripe_secret_key')

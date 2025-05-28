@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = '__all__'
 
 class RecipeSerializer(serializers.ModelSerializer):
     image_url = serializers.CharField(write_only=True, required=False)

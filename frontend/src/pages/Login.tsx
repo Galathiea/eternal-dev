@@ -32,7 +32,7 @@ export default function LoginPage() {
       }
 
       // Make API request
-      const response = await fetch('http://your-backend-url/api/auth/login/', {
+      const response = await fetch('http://127.0.0.1:8000/api/auth/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,16 +53,21 @@ export default function LoginPage() {
         )
       }
 
-      const data = await response.json()
+     // CORRECTED Snippet for LoginPage.tsx
+// ...
+      const data = await response.json()
 
-      // Store tokens or session information
-      if (data.access_token) {
-        localStorage.setItem('accessToken', data.access_token)
-        navigate('/') // Redirect to home on success
-      } else {
-        throw new Error('No access token received')
-      }
-
+      // Store tokens or session information
+      if (data.access) { // ⭐ Change from data.access_token to data.access ⭐
+        localStorage.setItem('accessToken', data.access)
+        if (data.refresh) { // Also good to store refresh token
+            localStorage.setItem('refreshToken', data.refresh)
+        }
+        navigate('/') // Redirect to home on success
+      } else {
+        throw new Error('No access token received')
+      }
+// ...
     } catch (err) {
       console.error('Login error:', err)
       setError(
