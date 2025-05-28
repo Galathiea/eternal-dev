@@ -122,6 +122,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+# Optional: Define STATIC_ROOT if you plan to collect static files for production
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+# ⭐⭐⭐ ADD THESE MEDIA SETTINGS ⭐⭐⭐
+# Media files (for user-uploaded content, like recipe images)
+MEDIA_URL = '/media/'
+# This will create a 'media' folder directly inside your 'backend' project root
+# (e.g., C:\Users\Galathiea\Downloads\eternal-dev\backend\media)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# ⭐⭐⭐ END MEDIA SETTINGS ⭐⭐⭐
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

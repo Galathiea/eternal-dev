@@ -17,10 +17,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
-    
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), write_only=True, source='category'
+    )
+
     class Meta:
         model = Recipe
         fields = '__all__'
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

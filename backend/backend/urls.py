@@ -17,6 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+# ⭐ NEW IMPORTS FOR MEDIA FILES ⭐
+from django.conf import settings
+from django.conf.urls.static import static
+# ⭐ END NEW IMPORTS ⭐
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include([
@@ -28,3 +33,10 @@ urlpatterns = [
         path('', include('api.urls')),  # This will include our main API endpoints
     ])),
 ]
+
+# ⭐⭐⭐ ADD THESE LINES TO SERVE MEDIA FILES IN DEVELOPMENT ⭐⭐⭐
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # You might also want to serve static files this way in development, if needed
+    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# ⭐⭐⭐ END MEDIA FILE SERVING CONFIGURATION ⭐⭐⭐
