@@ -16,16 +16,6 @@ interface Recipe {
   price: number;
 }
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: string;
-  quantity: number;
-  image: string;
-  time?: string;
-  servings?: string;
-}
-
 interface RecipeCardReProps {
   recipe: Recipe;
 }
