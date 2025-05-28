@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api, endpoints } from '../utils/api';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
 import Cart from './Cart';
 import RecipeForm from './RecipeForm';
@@ -144,13 +143,7 @@ export default function Dashboard() {
                       />
                     )}
                     <div>
-                      <Cart
-                        recipeId={recipe.id}
-                        recipePrice={recipe.price || 0}
-                        onAddToCart={() => {
-                          fetchRecipes();
-                        }}
-                      />
+                      <Cart />
                     </div>
                   </CardContent>
                 </Card>

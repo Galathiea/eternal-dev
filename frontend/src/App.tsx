@@ -9,7 +9,6 @@ import Signup from "./pages/Signup";
 import Cart from "./pages/Cart";
 import CartPage from "./pages/Cartpage";
 import Checkout from "./pages/Checkout";
-import CheckoutConfirmation from "./pages/CheckoutConfirmation";
 import CategoryPage from "./pages/CategoryPage";
 import OrderConfirmation from "./pages/CheckoutConfirmation";
 import OurStory from "./pages/OurStory";
@@ -22,7 +21,7 @@ import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
-import Profile from "./pages/Profile"; 
+import Profile from "./pages/profile"; 
 export default function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 
 interface Recipe {
-  id: number;
+  id: string; // Changed to string to match CartContext
   title: string;
   image: string;
   description: string;
@@ -16,36 +16,57 @@ interface Recipe {
   price: number;
 }
 
-interface RecipeCardProps {
+interface CartItem {
+  id: string;
+  name: string;
+  price: string;
+  quantity: number;
+  image: string;
+  time?: string;
+  servings?: string;
+}
+
+interface RecipeCardReProps {
   recipe: Recipe;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+const RecipeCard: React.FC<RecipeCardReProps> = ({ recipe }) => {
   const { cartItems, addToCart, updateQuantity } = useCart();
-  const navigate = useNavigate();
-  const cartItem = cartItems.find(item => item.id === recipe.id);
+  const cartItem = cartItems.find(item => item.id === String(recipe.id));
   const quantity = cartItem?.quantity || 0;
 
-  const handleIncrement = () => {
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (quantity === 0) {
-      addToCart(recipe);
+      addToCart({
+        id: String(recipe.id),
+        name: recipe.title,
+        price: recipe.price,
+        quantity: 1,
+        image: recipe.image,
+        time: recipe.time,
+        servings: recipe.servings.toString(),
+      });
     } else {
-      updateQuantity(recipe.id, quantity + 1);
+      updateQuantity(String(recipe.id), quantity + 1);
     }
   };
 
-  const handleDecrement = () => {
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (quantity > 0) {
-      updateQuantity(recipe.id, quantity - 1);
+      updateQuantity(String(recipe.id), quantity - 1);
     }
   };
 
   return (
     <Link to={`/recipes/${recipe.id}`}>
-      <div className="overflow-hidden transition-shadow bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer">
-        <img 
-          src={recipe.image} 
-          alt={recipe.title} 
+      <div className="relative overflow-hidden transition-shadow bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer">
+        <img
+          src={recipe.image}
+          alt={recipe.title}
           className="object-cover w-full h-48"
         />
         <div className="p-4">
@@ -64,10 +85,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDecrement();
-                  }}
+                  onClick={handleDecrement}
                   className="p-2 rounded-full text-gray-500 hover:text-gray-700"
                   disabled={quantity <= 0}
                 >
@@ -77,10 +95,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                   {quantity}
                 </span>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleIncrement();
-                  }}
+                  onClick={handleIncrement}
                   className="p-2 rounded-full text-gray-500 hover:text-gray-700"
                 >
                   <FaPlus />

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ShoppingCartButton } from "@/components/shopping-cart"
-import { ProfileButton } from "@/components/profile-button"
+import  ProfileButton  from "@/components/ProfileButton"
 import { Logo } from "@/components/logo"
 
 export function Layout() {
