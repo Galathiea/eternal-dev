@@ -1,9 +1,8 @@
-// src/config/api.ts
 import axios from 'axios';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-export const api = axios.create({ // This line already exports 'api'
+export const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -19,18 +18,16 @@ const refreshToken = async () => {
       throw new Error('No refresh token available');
     }
 
-    const response = await axios.post(`${API_URL}/api/token/refresh/`, { // Ensure correct URL
+    const response = await api.post('/api/token/refresh/', {
       refresh: refreshToken,
     });
 
     localStorage.setItem('token', response.data.access);
     return response.data.access;
   } catch (error) {
-    console.error("Token refresh failed:", error);
+    // Clear tokens on refresh failure
     localStorage.removeItem('token');
     localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user_data');
-    window.location.href = '/login'; // Redirect to login
     throw error;
   }
 };
@@ -56,8 +53,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // If the error is 401 and we haven't tried refreshing the token yet
-    // Also, ensure it's not the refresh endpoint itself to prevent loops
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/token/refresh/')) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
@@ -65,21 +61,13 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        return Promise.reject(refreshError);
-      }
-    }
-
-    // If it's a 401 on the refresh endpoint, or a 401 that wasn't handled by refresh logic
-    if (error.response?.status === 401 && !localStorage.getItem('refresh_token')) {
+        // Handle token refresh failure
         localStorage.removeItem('token');
         localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user_data');
-        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
     }
 
     return Promise.reject(error);
   }
 );
-
-// REMOVE THIS LINE:
-// export { api }; // This was the duplicate export

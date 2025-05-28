@@ -1,261 +1,159 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FaTrash, FaArrowLeft, FaCreditCard, FaMoneyBillWave, FaPaypal } from "react-icons/fa";
 
-import { api, endpoints } from '../utils/api';
-import axios from 'axios'; // ⭐ Import only axios ⭐
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-// ⭐ Define interfaces for your fetched data based on Django serializers ⭐
-interface RecipeInCart {
-  id: number;
-  title: string;
-  image: string | null;
+type CartItem = {
+  id: string;
+  name: string;
   price: number;
-}
-
-interface CartItem {
-  id: number;
-  recipe: RecipeInCart;
   quantity: number;
-  price: number;
-  total_price: number;
-}
+  image: string;
+};
 
-interface Cart {
-  id: number;
-  user: number;
-  items: CartItem[];
-  total_price: number;
-  created_at: string;
-  updated_at: string;
-}
-
-const CartPage: React.FC = () => {
-  const [cart, setCart] = useState<Cart | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [selectedPayment, setSelectedPayment] = useState<string>("");
-
-  const fetchCart = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.get<Cart>(endpoints.cart);
-      setCart(response.data);
-    } catch (err: unknown) { // ⭐ Type err as unknown initially ⭐
-      console.error('Error fetching cart:', err);
-
-      // ⭐ Use a type guard to check if err is an AxiosError ⭐
-      if (axios.isAxiosError(err)) {
-        // Now TypeScript knows err is an AxiosError, so err.response is safe to access
-        if (err.response && err.response.status === 401) {
-          setError('Please log in to view your cart.');
-        } else {
-          setError('Failed to load cart. Please try again.');
-        }
-      } else {
-        // Handle non-Axios errors (e.g., network issues before request is sent)
-        setError('An unexpected error occurred. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+const Cart = () => {
+  const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    fetchCart();
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+    }
   }, []);
 
-  const updateQuantity = async (itemId: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
 
-    try {
-      await api.put(`${endpoints.cart}update/${itemId}/`, { quantity: newQuantity });
-      fetchCart();
-    } catch (err: unknown) { // ⭐ Type err as unknown ⭐
-      console.error('Error updating quantity:', err);
-      if (axios.isAxiosError(err)) { // ⭐ Type guard ⭐
-        setError('Failed to update item quantity: ' + (err.response?.data?.detail || err.message));
-      } else {
-        setError('An unexpected error occurred while updating quantity.');
-      }
-    }
-  };
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
-  const removeItem = async (itemId: number) => {
-    if (!window.confirm('Are you sure you want to remove this item from your cart?')) {
+  const updateQuantity = (id: string, newQuantity: number) => {
+    if (newQuantity < 1) {
+      removeItem(id);
       return;
     }
-    try {
-      await api.delete(`${endpoints.cart}remove/${itemId}/`);
-      fetchCart();
-    } catch (err: unknown) { // ⭐ Type err as unknown ⭐
-      console.error('Error removing item:', err);
-      if (axios.isAxiosError(err)) { // ⭐ Type guard ⭐
-        setError('Failed to remove item from cart: ' + (err.response?.data?.detail || err.message));
-      } else {
-        setError('An unexpected error occurred while removing item.');
-      }
-    }
+    setCartItems(cartItems.map(item => 
+      item.id === id ? { ...item, quantity: newQuantity } : item
+    ));
+  };
+
+  const removeItem = (id: string) => {
+    setCartItems(cartItems.filter(item => item.id !== id));
+  };
+
+  const calculateSubtotal = () => {
+    return cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  };
+
+  const calculateShipping = () => {
+    return cartItems.length > 0 ? 5.99 : 0;
+  };
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + calculateShipping();
   };
 
   const handleCheckout = () => {
-    if (!selectedPayment) {
-      alert("Please select a payment method");
-      return;
-    }
-    alert(`Order placed successfully with ${selectedPayment} payment!`);
+    navigate('/checkout', { state: { cartItems } });
   };
 
-  if (loading) {
-    return <div className="text-center p-8 text-lg">Loading your cart...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center p-8 text-lg text-red-600">{error}</div>;
-  }
-
-  if (!cart || cart.items.length === 0) {
-    return (
-      <div className="container px-4 py-8 mx-auto">
-        <div className="flex items-center mb-6">
-          <Link to="/recipes" className="flex items-center text-orange-500 hover:text-orange-700">
-            <FaArrowLeft className="mr-2" />
-            Continue Shopping
-          </Link>
-          <h1 className="ml-6 text-3xl font-bold">Your Cart</h1>
-        </div>
-        <div className="p-8 text-center bg-white rounded-lg shadow">
-          <p className="text-lg">Your cart is empty</p>
-          <Link to="/recipes" className="mt-4 inline-block px-6 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600">
-            Browse Recipes
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container px-4 py-8 mx-auto">
-      <div className="flex items-center mb-6">
-        <Link to="/recipes" className="flex items-center text-orange-500 hover:text-orange-700">
-          <FaArrowLeft className="mr-2" />
-          Continue Shopping
-        </Link>
-        <h1 className="ml-6 text-3xl font-bold">Your Cart</h1>
-      </div>
+    <div className="min-h-screen px-4 py-8 bg-gray-50 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="mb-8 text-3xl font-bold text-gray-800">Your Shopping Cart</h1>
 
-      <div className="grid gap-8 md:grid-cols-3">
-        {/* Cart Items */}
-        <div className="md:col-span-2">
-          <div className="space-y-4">
-            {cart.items.map(item => (
-              <div key={item.id} className="flex p-4 bg-white rounded-lg shadow">
-                {item.recipe.image && (
-                  <img src={item.recipe.image} alt={item.recipe.title} className="w-24 h-24 object-cover rounded-md" />
-                )}
-                <div className="flex flex-col flex-grow ml-4">
-                  <h3 className="text-lg font-semibold">{item.recipe.title}</h3>
-                  <p className="text-gray-600">₱{item.price.toFixed(2)}</p>
-                  <div className="flex items-center mt-2">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="px-3 py-1 bg-gray-200 rounded-l"
-                    >
-                        -
-                    </button>
-                    <span className="px-4 py-1 bg-gray-100">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="px-3 py-1 bg-gray-200 rounded-r"
-                    >
-                        +
-                    </button>
+        {cartItems.length === 0 ? (
+          <div className="p-8 text-center bg-white rounded-lg shadow">
+            <svg className="w-12 h-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <h2 className="mt-4 text-lg font-medium text-gray-800">Your cart is empty</h2>
+            <Link
+              to="/recipes"
+              className="inline-flex items-center px-4 py-2 mt-6 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md shadow-sm hover:bg-orange-700"
+            >
+              Browse Recipes
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-hidden bg-white rounded-lg shadow">
+            <div className="divide-y divide-gray-200">
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex p-4 sm:p-6">
+                  <div className="flex-shrink-0">
+                    <img className="object-cover w-24 h-24 rounded-md" src={item.image} alt={item.name} />
+                  </div>
+                  <div className="flex flex-col justify-between flex-1 ml-4 sm:flex-row">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
+                      <p className="mt-1 text-gray-600">${item.price.toFixed(2)}</p>
+                    </div>
+                    <div className="flex items-center mt-4 sm:mt-0">
+                      <div className="flex items-center border border-gray-300 rounded-md">
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="px-3 py-1 text-gray-600 hover:text-orange-600"
+                        >
+                          -
+                        </button>
+                        <span className="px-3 py-1 text-gray-800">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="px-3 py-1 text-gray-600 hover:text-orange-600"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="ml-4 text-gray-500 hover:text-orange-600"
+                      >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col items-end justify-between">
-                  <p className="font-semibold">₱{item.total_price.toFixed(2)}</p>
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="p-2 text-red-500 hover:text-red-700"
-                  >
-                    <FaTrash />
-                  </button>
+              ))}
+            </div>
+
+            <div className="p-4 border-t border-gray-200 sm:p-6">
+              <h2 className="mb-4 text-lg font-medium text-gray-800">Order Summary</h2>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Subtotal ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
+                  <span className="text-gray-800">${calculateSubtotal().toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Shipping</span>
+                  <span className="text-gray-800">${calculateShipping().toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between pt-3 border-t border-gray-200">
+                  <span className="text-lg font-bold text-gray-800">Total</span>
+                  <span className="text-lg font-bold text-orange-600">${calculateTotal().toFixed(2)}</span>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Order Summary */}
-        <div className="p-6 bg-white rounded-lg shadow h-fit">
-          <h2 className="mb-4 text-xl font-bold">Order Summary</h2>
-
-          <div className="mb-6 space-y-3">
-            {cart.items.map(item => (
-              <div key={item.id} className="flex justify-between">
-                <span>
-                  {item.recipe.title} × {item.quantity}
-                </span>
-                <span>₱{(item.price * item.quantity).toFixed(2)}</span>
+              <div className="mt-6 space-y-4">
+                <button
+                  onClick={handleCheckout}
+                  className="w-full px-6 py-3 text-base font-medium text-white bg-orange-600 border border-transparent rounded-md shadow-sm hover:bg-orange-700"
+                >
+                  Proceed to Checkout
+                </button>
+                <Link
+                  to="/recipes"
+                  className="flex items-center justify-center w-full px-6 py-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+                >
+                  Continue Shopping
+                </Link>
               </div>
-            ))}
-          </div>
-
-          <div className="py-4 border-t border-b border-gray-200">
-            <div className="flex justify-between mb-2">
-              <span>Subtotal</span>
-              <span>₱{cart.total_price.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between mb-2">
-              <span>Delivery Fee</span>
-              <span>₱2.99</span>
-            </div>
-            <div className="flex justify-between font-bold">
-              <span>Total</span>
-              <span>₱{(cart.total_price + 2.99).toFixed(2)}</span>
             </div>
           </div>
-
-          {/* Payment Methods */}
-          <div className="my-6">
-            <h3 className="mb-3 font-semibold">Payment Method</h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => setSelectedPayment("credit")}
-                className={`flex items-center w-full p-3 border rounded-lg ${selectedPayment === "credit" ? "border-orange-500 bg-orange-50" : "border-gray-300"}`}
-              >
-                <FaCreditCard className="mr-3" />
-                Credit/Debit Card
-              </button>
-              <button
-                onClick={() => setSelectedPayment("paypal")}
-                className={`flex items-center w-full p-3 border rounded-lg ${selectedPayment === "paypal" ? "border-orange-500 bg-orange-50" : "border-gray-300"}`}
-              >
-                <FaPaypal className="mr-3" />
-                PayPal
-              </button>
-              <button
-                onClick={() => setSelectedPayment("cash")}
-                className={`flex items-center w-full p-3 border rounded-lg ${selectedPayment === "cash" ? "border-orange-500 bg-orange-50" : "border-gray-300"}`}
-              >
-                <FaMoneyBillWave className="mr-3" />
-                Cash on Delivery
-              </button>
-            </div>
-          </div>
-
-          <button
-            onClick={handleCheckout}
-            className="w-full py-3 font-bold text-white bg-orange-500 rounded-lg hover:bg-orange-600"
-          >
-            Proceed to Checkout
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default CartPage;
+export default Cart;

@@ -1,4 +1,5 @@
 export interface CartItem {
+    stock: number;
     id: string;
     name: string;
     price: number;
@@ -8,6 +9,9 @@ export interface CartItem {
   
   // Cart store implementation
   class CartStore {
+    clear() {
+      throw new Error("Method not implemented.");
+    }
     private items: CartItem[] = [];
     private listeners = new Set<() => void>();
   

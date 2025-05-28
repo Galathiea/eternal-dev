@@ -1,14 +1,13 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { toast } from 'react-toastify';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface CartItem {
   id: string;
   name: string;
-  price: string; // Keep this as string if Recipe.price is string
+  price: number;
   quantity: number;
   image: string;
-  time?: string;
-  servings?: string;
+  time?: string;        // Optional from Recipe interface
+  servings?: string;    // Optional from Recipe interface
 }
 
 interface CartContextType {
@@ -20,30 +19,30 @@ interface CartContextType {
   restoreCart: (items: CartItem[]) => void;
 }
 
+console.log('Creating CartContext'); // Debug log - should appear only once
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   // Initialize state with localStorage if available
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    try {
+    if (typeof window !== 'undefined') {
       const savedCart = localStorage.getItem('cart');
       return savedCart ? JSON.parse(savedCart) : [];
-    } catch (error) {
-      console.error("Failed to parse cart from localStorage:", error);
-      return [];
     }
+    return [];
   });
 
   // Persist cart to localStorage whenever it changes
   useEffect(() => {
-    try {
+    console.log('Cart updated:', cartItems); // Debug log
+    if (typeof window !== 'undefined') {
       localStorage.setItem('cart', JSON.stringify(cartItems));
-    } catch (error) {
-      console.error("Failed to save cart to localStorage:", error);
     }
   }, [cartItems]);
 
   const addToCart = (item: CartItem) => {
+    console.log('Adding item to cart:', item); // Debug log
     setCartItems(prev => {
       const existingItem = prev.find(cartItem => cartItem.id === item.id);
       if (existingItem) {
@@ -55,16 +54,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, item];
     });
-    toast.success(`${item.name} added to cart!`);
   };
 
   const removeFromCart = (id: string) => {
+    console.log('Removing item from cart:', id); // Debug log
     setCartItems(prev => prev.filter(item => item.id !== id));
-    toast.info("Item removed from cart!");
   };
 
   const updateQuantity = (id: string, quantity: number) => {
-    if (quantity < 1) {
+    console.log('Updating quantity for item:', id, 'to', quantity); // Debug log
+    if (quantity <= 0) {
       removeFromCart(id);
       return;
     }
@@ -74,11 +73,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const clearCart = () => {
+    console.log('Clearing cart'); // Debug log
     setCartItems([]);
-    toast.info("Cart has been cleared!");
   };
 
   const restoreCart = (items: CartItem[]) => {
+    console.log('Restoring cart:', items); // Debug log
     setCartItems(items);
   };
 

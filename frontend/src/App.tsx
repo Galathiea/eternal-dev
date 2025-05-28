@@ -1,35 +1,28 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-// Core Layout Components
 import Navbar from "./components/ui/Navbar";
-import Footer from "./components/Footer";
-
-// Context Providers
-import { CartProvider } from './context/CartContext';
-import { AuthProvider } from './context/AuthContext';
-
-// Page Components
 import Home from "./pages/home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Cart from "./pages/Cart";
 import CartPage from "./pages/Cartpage";
 import Checkout from "./pages/Checkout";
-import OrderConfirmation from "./pages/CheckoutConfirmation";
+import CheckoutConfirmation from "./pages/CheckoutConfirmation";
 import CategoryPage from "./pages/CategoryPage";
+import OrderConfirmation from "./pages/CheckoutConfirmation";
 import OurStory from "./pages/OurStory";
 import Recipes from "./pages/recipes";
 import ProductDetail from "./pages/productdetail";
 import RecipeDetail from "./pages/RecipeDetail";
 import Dashboard from "./components/Dashboard";
 import BackendTest from "./components/BackendTest";
+import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Profile } from "./pages/profile";
-
+import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
+import Profile from "./pages/Profile"; 
 export default function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -67,21 +60,22 @@ export default function App() {
             <Route path="/our-story" element={<OurStory />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/backend-test" element={<BackendTest />} />
-            <Route path="/cart" element={<CartPage />} />
-
-            {/* Protected Routes */}
+            
+            {/* Semi-Protected Routes (Cart remains public) */}
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/cart-page" element={<CartPage />} />
+            
+            {/* Fully Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/checkout-confirmation" element={<OrderConfirmation />} />
-              <Route path="/profile" element={<Profile />} />
+              <Route path="/profile" element={<Profile />} /> {/* Add the ProfilePage route */}
               <Route path="/dashboard" element={<Dashboard />} />
             </Route>
-
-            {/* Catch-all route for unmatched paths */}
+            
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Footer />
-          <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
         </Router>
       </CartProvider>
     </AuthProvider>

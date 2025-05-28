@@ -5,7 +5,7 @@ const Home: React.FC = () => {
   // In the Home component, update the featuredRecipes array to use IDs instead of routes:
   const featuredRecipes = [
     {
-      id: 7, // Add ID
+      id: 1, // Add ID
       title: "Creamy Garlic Pasta",
       description: "A rich and creamy pasta dish with roasted garlic, parmesan cheese, and fresh herbs.",
       time: "30 min",
@@ -57,15 +57,6 @@ const Home: React.FC = () => {
       servings: "2 servings",
       difficulty: "Easy",
       image: "https://plus.unsplash.com/premium_photo-1692193552327-3458ef3817c0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    },
-    {
-      id: 1,
-      title: "Chicken Adobo",
-      description: "Chicken Adobo is a classic Filipino dish where chicken is simmered to tender perfection in a flavorful blend of soy sauce, vinegar, garlic, peppercorns, and bay leaves..",
-      time: "45 min",
-      servings: "4 servings",
-      difficulty: "Easy",
-      image: "https://bing.com/th?id=OSK.7ffa717fdffcc656c269004e243c1fbb"
     },
   ];
 
