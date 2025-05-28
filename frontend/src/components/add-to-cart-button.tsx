@@ -34,6 +34,7 @@ export function AddToCartButton({ productId, productName, price, image, quantity
         price,
         image,
         quantity,
+        stock: 0
       })
 
       const totalItems = cartStore.getItemCount()

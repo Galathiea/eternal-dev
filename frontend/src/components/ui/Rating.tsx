@@ -1,4 +1,4 @@
-import * as Slider from "@radix-ui/react-slider";
+import { Slider } from "@/components/ui/slider";
 import { Button } from "./button";
 
 export const Rating = () => {
@@ -10,17 +10,13 @@ export const Rating = () => {
           <label htmlFor="rating" className="block mb-2 text-gray-700">
             Rating
           </label>
-          <Slider.Root
+          <Slider
+            id="rating"
             defaultValue={[5]}
             max={5}
             step={1}
-            className="relative flex items-center w-full h-5 select-none touch-none"
-          >
-            <Slider.Track className="relative h-1 bg-gray-200 rounded-full grow">
-              <Slider.Range className="absolute h-full bg-blue-500 rounded-full" />
-            </Slider.Track>
-            <Slider.Thumb className="block w-5 h-5 bg-white border-2 border-blue-500 rounded-full focus:outline-none focus:shadow-lg" />
-          </Slider.Root>
+            className="w-full"
+          />
         </div>
         <div className="mb-6">
           <label htmlFor="comment" className="block mb-2 text-gray-700">
