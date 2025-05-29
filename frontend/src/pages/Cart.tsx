@@ -126,7 +126,7 @@ const Cart = () => {
         {cartItems.length === 0 ? (
           <div className="p-8 text-center bg-white rounded-lg shadow">
             <div className="flex justify-center">
-              <FaShoppingCart className="w-12 h-12 text-gray-400" />
+              {FaShoppingCart && <FaShoppingCart className="w-12 h-12 text-gray-400" />}
             </div>
             <h2 className="mt-4 text-lg font-medium text-gray-800">Your cart is empty</h2>
             <p className="mt-1 text-gray-600">Looks like you haven't added anything to your cart yet</p>

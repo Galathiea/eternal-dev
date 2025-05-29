@@ -1,6 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '@/context/CartContext';
+
+interface CartProps {
+  recipeId?: number;
+  recipePrice?: number;
+  onAddToCart?: () => void;
+}
 
 type CartItem = {
   id: string;
@@ -10,34 +16,42 @@ type CartItem = {
   image: string;
 };
 
-const Cart = () => {
+const Cart = ({ recipeId, recipePrice, onAddToCart }: CartProps) => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { cartItems, updateCart } = useCart();
+  const [isClient, setIsClient] = useState(false);
 
+  // Handle the simple case where we just need to add to cart
+  if (recipeId && recipePrice && onAddToCart) {
+    return (
+      <button 
+        onClick={onAddToCart}
+        className="px-4 py-2 text-white bg-orange-600 rounded-md hover:bg-orange-700"
+      >
+        Add to Cart (${recipePrice.toFixed(2)})
+      </button>
+    );
+  }
+
+  // Ensure we're on the client side before accessing localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
-    }
+    setIsClient(true);
   }, []);
-
-
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) {
       removeItem(id);
       return;
     }
-    setCartItems(cartItems.map(item => 
+    const updatedItems = cartItems.map(item => 
       item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
+    );
+    updateCart(updatedItems);
   };
 
   const removeItem = (id: string) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+    const updatedItems = cartItems.filter(item => item.id !== id);
+    updateCart(updatedItems);
   };
 
   const calculateSubtotal = () => {
@@ -56,6 +70,11 @@ const Cart = () => {
     navigate('/checkout', { state: { cartItems } });
   };
 
+  // Don't render on server side
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen px-4 py-8 bg-gray-50 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -69,7 +88,7 @@ const Cart = () => {
             <h2 className="mt-4 text-lg font-medium text-gray-800">Your cart is empty</h2>
             <Link
               to="/recipes"
-              className="inline-flex items-center px-4 py-2 mt-6 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md shadow-sm hover:bg-orange-700"
+              className="inline-flex items-center px-4 py-2 mt-6 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
             >
               Browse Recipes
             </Link>
@@ -80,7 +99,13 @@ const Cart = () => {
               {cartItems.map((item) => (
                 <div key={item.id} className="flex p-4 sm:p-6">
                   <div className="flex-shrink-0">
-                    <img className="object-cover w-24 h-24 rounded-md" src={item.image} alt={item.name} />
+                    <img 
+                      className="object-cover w-24 h-24 rounded-md" 
+                      src={item.image} 
+                      alt={item.name}
+                      width={96}
+                      height={96}
+                    />
                   </div>
                   <div className="flex flex-col justify-between flex-1 ml-4 sm:flex-row">
                     <div className="flex-1">
@@ -91,21 +116,24 @@ const Cart = () => {
                       <div className="flex items-center border border-gray-300 rounded-md">
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="px-3 py-1 text-gray-600 hover:text-orange-600"
+                          className="px-3 py-1 text-gray-600 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          aria-label="Decrease quantity"
                         >
                           -
                         </button>
                         <span className="px-3 py-1 text-gray-800">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="px-3 py-1 text-gray-600 hover:text-orange-600"
+                          className="px-3 py-1 text-gray-600 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          aria-label="Increase quantity"
                         >
                           +
                         </button>
                       </div>
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="ml-4 text-gray-500 hover:text-orange-600"
+                        className="p-1 ml-4 text-gray-500 rounded-md hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        aria-label="Remove item"
                       >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -137,13 +165,13 @@ const Cart = () => {
               <div className="mt-6 space-y-4">
                 <button
                   onClick={handleCheckout}
-                  className="w-full px-6 py-3 text-base font-medium text-white bg-orange-600 border border-transparent rounded-md shadow-sm hover:bg-orange-700"
+                  className="w-full px-6 py-3 text-base font-medium text-white bg-orange-600 border border-transparent rounded-md shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                 >
                   Proceed to Checkout
                 </button>
                 <Link
                   to="/recipes"
-                  className="flex items-center justify-center w-full px-6 py-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+                  className="flex items-center justify-center w-full px-6 py-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                 >
                   Continue Shopping
                 </Link>

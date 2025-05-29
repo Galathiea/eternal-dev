@@ -1,79 +1,48 @@
-"use client"
-
-import { useState } from "react"
-import { ShoppingCart, Check } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
-import { cartStore } from "@/lib/cart-store"
+import * as React from "react";
+import { useCart } from "../context/CartContext";
 
 interface AddToCartButtonProps {
-  productId: string
-  productName: string
-  price: number
-  image: string
-  quantity?: number
+  productId: string;
+  productName: string;
+  price: number;
+  image: string;
+  quantity?: number;
+  time?: string;
+  servings?: string;
 }
 
-export function AddToCartButton({ productId, productName, price, image, quantity = 1 }: AddToCartButtonProps) {
-  const [isAdding, setIsAdding] = useState(false)
-  const [isAdded, setIsAdded] = useState(false)
-  const { toast } = useToast()
+export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
+  productId,
+  productName,
+  price,
+  image,
+  quantity = 1,
+  time,
+  servings,
+}) => {
+  const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    setIsAdding(true)
-
-    // Simulate API call to add item to cart
-    setTimeout(() => {
-      setIsAdding(false)
-      setIsAdded(true)
-
-      // Add to cart
-      cartStore.addItem({
-        id: productId,
-        name: productName,
-        price,
-        image,
-        quantity,
-        stock: 0
-      })
-
-      const totalItems = cartStore.getItemCount()
-
-      toast({
-        title: "Added to cart",
-        description: `${productName} (${quantity}) has been added to your cart. Total items: ${totalItems}`,
-      })
-
-      // Reset button state after 2 seconds
-      setTimeout(() => {
-        setIsAdded(false)
-      }, 2000)
-    }, 500)
-  }
+    addToCart({
+      id: productId,
+      name: productName,
+      price,
+      quantity,
+      image,
+      time,
+      servings
+    });
+    
+    console.log(`Added ${quantity} ${productName} to cart`);
+    // Optional: Add toast notification here
+  };
 
   return (
-    <Button
+    <button
       onClick={handleAddToCart}
-      disabled={isAdding || isAdded}
-      className={`w-full ${isAdded ? "bg-green-600 hover:bg-green-700" : "bg-[#e63946] hover:bg-[#d62b39]"} text-white`}
+      className="w-full bg-[#e63946] hover:bg-[#d62b39] text-white py-2 px-4 rounded-md transition-colors duration-200"
     >
-      {isAdding ? (
-        <span className="flex items-center">
-          <span className="w-4 h-4 mr-2 border-2 border-white rounded-full animate-spin border-t-transparent" />
-          Adding...
-        </span>
-      ) : isAdded ? (
-        <span className="flex items-center">
-          <Check className="w-4 h-4 mr-2" />
-          Added to Cart {quantity > 1 ? `(${quantity})` : ""}
-        </span>
-      ) : (
-        <span className="flex items-center">
-          <ShoppingCart className="w-4 h-4 mr-2" />
-          Add to Cart {quantity > 1 ? `(${quantity})` : ""}
-        </span>
-      )}
-    </Button>
-  )
-}
-
+      Add to Cart
+    </button>
+  );
+};

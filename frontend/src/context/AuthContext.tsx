@@ -1,65 +1,63 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import * as authService from "../services/auth";
+// src/contexts/AuthContext.tsx
+"use client"
 
-interface User {
-  name: string;
-  email: string;
-  profileImage?: string;
-}
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
-interface AuthContextType {
+// Extended AuthContextType interface
+export interface AuthContextType {
   isAuthenticated: boolean;
-  user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  register: (data: { email: string; password: string; name: string }) => Promise<void>;
+  login: () => void;
+  logout: () => void;
+  user?: {
+    name?: string; // <-- Add this line to support user.name in Navbar
+    profileImage?: string;
+    // add other user properties as needed
+  };
+  // ...other properties
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState<{ name?: string; profileImage?: string } | undefined>(undefined)
 
   useEffect(() => {
-    // Optionally, load user from localStorage or API here
-    const storedUser = localStorage.getItem("user");
+    // Check if user is logged in on initial load
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true"
+    setIsAuthenticated(loggedIn)
+    // Optionally load user from localStorage
+    const storedUser = localStorage.getItem("user")
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
+      setUser(JSON.parse(storedUser))
     }
-  }, []);
+  }, [])
 
-  const login = async (email: string, password: string) => {
-    const userData = await authService.login(email, password);
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
-  };
+  const login = () => {
+    localStorage.setItem("isLoggedIn", "true")
+    setIsAuthenticated(true)
+    // Example: set user info here if available
+    // setUser({ name: "John Doe", profileImage: "/profile.jpg" })
+  }
 
-  const logout = async () => {
-    await authService.logout();
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem("user");
-  };
-
-  const register = async (data: { email: string; password: string; name: string }) => {
-    const userData = await authService.register(data);
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
-  };
+  const logout = () => {
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("user")
+    setIsAuthenticated(false)
+    setUser(undefined)
+  }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, register }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, user }}>
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
-  return context;
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
 }
