@@ -1,8 +1,13 @@
 from django.urls import path
-from .views import CartView, CartItemCreateView, CartItemDeleteView
+from . import views
+
+app_name = 'cart'
 
 urlpatterns = [
-    path('', CartView.as_view(), name='user-cart'), # GET user's cart
-    path('create/', CartItemCreateView.as_view(), name='add-to-cart'), # POST to add item
-    path('delete/<int:pk>/', CartItemDeleteView.as_view(), name='update-cart-item'), # PUT/PATCH quantity
+    path('', views.CartView.as_view(), name='cart'),
+    path('items/', views.CartItemCreateView.as_view(), name='cart-item-create'),
+    path('items/<int:pk>/', views.CartItemUpdateView.as_view(), name='cart-item-update'),
+    path('items/<int:pk>/delete/', views.CartItemDeleteView.as_view(), name='cart-item-delete'),
+    path('clear/', views.clear_cart, name='cart-clear'),
+    path('count/', views.cart_count, name='cart-count'),
 ]

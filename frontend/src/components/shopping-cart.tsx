@@ -2,37 +2,49 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { ShoppingCart, Plus, Minus, Trash2, X } from "lucide-react"
+import { ShoppingCart, Plus, Minus, Trash2, X, AlertCircle, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { cartStore } from "@/lib/cart-store"
+import { useCart } from "../context/CartContext"
+import { useAuth } from "../context/AuthContext"
 
 export function ShoppingCartButton() {
-  const [cartItems, setCartItems] = useState(cartStore.getItems())
+  const { 
+    cartItems, 
+    updateQuantity, 
+    removeFromCart, 
+    clearCart, 
+    cartTotal, 
+    itemCount, 
+    isLoading, 
+    error 
+  } = useCart()
+  const { isAuthenticated } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
 
-  useEffect(() => {
-    // Subscribe to cart updates
-    const unsubscribe = cartStore.subscribe(() => {
-      setCartItems(cartStore.getItems())
-    })
+  const shipping = itemCount > 0 ? 5.99 : 0
+  const total = cartTotal + shipping
 
-    return () => unsubscribe()
-  }, [])
-
-  const updateQuantity = (id: string, change: number) => {
-    cartStore.updateQuantity(id, change)
+  const handleQuantityUpdate = async (id: string, change: number) => {
+    const currentItem = cartItems.find(item => item.id === id)
+    if (currentItem) {
+      const newQuantity = currentItem.quantity + change
+      if (newQuantity > 0) {
+        await updateQuantity(id, newQuantity)
+      } else {
+        await removeFromCart(id)
+      }
+    }
   }
 
-  const removeItem = (id: string) => {
-    cartStore.removeItem(id)
+  const handleRemoveItem = async (id: string) => {
+    await removeFromCart(id)
   }
 
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shipping = 5.99
-  const total = subtotal + shipping
+  const handleClearCart = async () => {
+    await clearCart()
+  }
 
   return (
     <div className="relative">
@@ -40,16 +52,16 @@ export function ShoppingCartButton() {
         variant="outline"
         size="icon"
         className="relative border-amber-200 hover:bg-amber-50 hover:text-amber-800"
-        aria-label={`Shopping Cart with ${totalItems} items`}
+        aria-label={`Shopping Cart with ${itemCount} items`}
         onClick={() => setIsOpen(true)}
       >
         <ShoppingCart className="w-5 h-5" />
-        {totalItems > 0 && (
+        {itemCount > 0 && (
           <Badge
             className="absolute -top-2 -right-2 px-2 py-1 bg-amber-600 text-white font-bold min-w-[20px] h-5 flex items-center justify-center"
             aria-hidden="true"
           >
-            {totalItems}
+            {itemCount}
           </Badge>
         )}
       </Button>
@@ -61,9 +73,9 @@ export function ShoppingCartButton() {
               <h2 className="flex items-center text-lg font-bold">
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Your Shopping Cart
-                {totalItems > 0 && (
+                {itemCount > 0 && (
                   <Badge className="ml-2 bg-amber-600">
-                    {totalItems} {totalItems === 1 ? "item" : "items"}
+                    {itemCount} {itemCount === 1 ? "item" : "items"}
                   </Badge>
                 )}
               </h2>
@@ -72,7 +84,29 @@ export function ShoppingCartButton() {
               </Button>
             </div>
 
-            {cartItems.length === 0 ? (
+            {/* Error Display */}
+            {error && (
+              <div className="flex items-center gap-2 p-4 m-4 text-red-700 bg-red-50 border border-red-200 rounded-md">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <p className="text-sm">{error}</p>
+              </div>
+            )}
+
+            {/* Authentication Status */}
+            {!isAuthenticated && cartItems.length > 0 && (
+              <div className="p-4 m-4 text-blue-700 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm">
+                  <strong>Sign in</strong> to sync your cart across devices and enable checkout.
+                </p>
+              </div>
+            )}
+
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+                <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+                <p className="text-[#6b6b6b]">Loading cart...</p>
+              </div>
+            ) : cartItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
                 <ShoppingCart className="h-16 w-16 text-[#e6d7c8]" />
                 <h3 className="text-lg font-medium text-[#2b2b2b]">Your cart is empty</h3>
@@ -95,6 +129,10 @@ export function ShoppingCartButton() {
                       </div>
                       <div className="flex flex-col flex-1">
                         <h4 className="font-medium text-[#2b2b2b]">{item.name}</h4>
+                        <p className="text-sm text-[#6b6b6b]">
+                          {item.time && `⏱️ ${item.time}`}
+                          {item.servings && ` • 👥 ${item.servings} servings`}
+                        </p>
                         <p className="font-medium text-amber-800">${item.price.toFixed(2)}</p>
                         <div className="flex items-center justify-between mt-auto">
                           <div className="flex items-center border rounded-md border-amber-200">
@@ -102,8 +140,9 @@ export function ShoppingCartButton() {
                               variant="ghost"
                               size="icon"
                               className="w-8 h-8 p-0 hover:bg-amber-50 hover:text-amber-800"
-                              onClick={() => updateQuantity(item.id, -1)}
+                              onClick={() => handleQuantityUpdate(item.id, -1)}
                               aria-label={`Decrease quantity of ${item.name}`}
+                              disabled={isLoading}
                             >
                               <Minus className="w-3 h-3" />
                             </Button>
@@ -114,8 +153,9 @@ export function ShoppingCartButton() {
                               variant="ghost"
                               size="icon"
                               className="w-8 h-8 p-0 hover:bg-amber-50 hover:text-amber-800"
-                              onClick={() => updateQuantity(item.id, 1)}
+                              onClick={() => handleQuantityUpdate(item.id, 1)}
                               aria-label={`Increase quantity of ${item.name}`}
+                              disabled={isLoading}
                             >
                               <Plus className="w-3 h-3" />
                             </Button>
@@ -124,8 +164,9 @@ export function ShoppingCartButton() {
                             variant="ghost"
                             size="icon"
                             className="w-8 h-8 p-0 hover:bg-amber-50 hover:text-amber-800"
-                            onClick={() => removeItem(item.id)}
+                            onClick={() => handleRemoveItem(item.id)}
                             aria-label={`Remove ${item.name} from cart`}
+                            disabled={isLoading}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -139,14 +180,16 @@ export function ShoppingCartButton() {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-[#6b6b6b]">
-                        Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})
+                        Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
                       </span>
-                      <span className="font-medium text-[#2b2b2b]">${subtotal.toFixed(2)}</span>
+                      <span className="font-medium text-[#2b2b2b]">${cartTotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#6b6b6b]">Shipping</span>
-                      <span className="font-medium text-[#2b2b2b]">${shipping.toFixed(2)}</span>
-                    </div>
+                    {shipping > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-[#6b6b6b]">Shipping</span>
+                        <span className="font-medium text-[#2b2b2b]">${shipping.toFixed(2)}</span>
+                      </div>
+                    )}
                     <hr className="border-[#e6d7c8]" />
                     <div className="flex justify-between">
                       <span className="font-medium text-[#2b2b2b]">Total</span>
@@ -155,16 +198,50 @@ export function ShoppingCartButton() {
                   </div>
 
                   <div className="mt-6 space-y-2">
-                    <Link to="/checkout" onClick={() => setIsOpen(false)}>
-                      <Button className="w-full text-white bg-amber-600 hover:bg-amber-700">Proceed to Checkout</Button>
-                    </Link>
-                    <Button
-                      variant="outline"
-                      className="w-full border-amber-200 hover:bg-amber-50 hover:text-amber-800"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Continue Shopping
-                    </Button>
+                    {isAuthenticated ? (
+                      <Link to="/checkout" onClick={() => setIsOpen(false)}>
+                        <Button 
+                          className="w-full text-white bg-amber-600 hover:bg-amber-700"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            "Proceed to Checkout"
+                          )}
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link to="/auth" onClick={() => setIsOpen(false)}>
+                        <Button className="w-full text-white bg-amber-600 hover:bg-amber-700">
+                          Sign In to Checkout
+                        </Button>
+                      </Link>
+                    )}
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-amber-200 hover:bg-amber-50 hover:text-amber-800"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Continue Shopping
+                      </Button>
+                      
+                      {cartItems.length > 0 && (
+                        <Button
+                          variant="outline"
+                          className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          onClick={handleClearCart}
+                          disabled={isLoading}
+                        >
+                          Clear Cart
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </>
@@ -175,4 +252,3 @@ export function ShoppingCartButton() {
     </div>
   )
 }
-
